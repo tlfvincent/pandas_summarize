@@ -12,10 +12,14 @@ lst = [[1, 'block', 1.4],
        [3, 'ok', 7.9],
        [None, '', 2.0]]
 df = pd.DataFrame(lst, columns=['col1', 'col2', 'col3'])
+```
 
+```
 dfs = DataFrameSummary(df)
 dfs.get_summary()
+```
 
+```
 column_name       col1    col2     col3
 dtypes         float64  object  float64
 missing_%           80     100      100
