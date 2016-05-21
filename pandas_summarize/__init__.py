@@ -18,39 +18,54 @@ class DataFrameSummary(object):
         self.df = df
         self.columns = df.columns
         self.shape = df.shape
+        self.row_count = df.shape[0]
         self.count = df.count()
-        self.columns_stats = self.get_summary()
 
 
     def get_column_types(self):
         '''get column type of each column in dataframe'''
-        types = [[col, self.df[col].dtype] for col in self.columns]
+        types = [[col, self.df[col].dtype, 'dtypes'] for col in self.columns]
         col_types_df = pd.DataFrame(types,
                                     columns=['column_name',
-                                             'column_type'])
+                                             'value',
+                                             'variable'])
         return col_types_df
 
 
     def get_missing_count(self):
         '''get raw count of missing values in each column'''
-        missing_cnt = [x, self.count[i]] for i, x in enumerate(self.columns)]
+        missing_cnt = [[x,
+                        self.row_count - self.count[i],
+                        'missing_count'] for i, x in enumerate(self.columns)]
         missing_cnt_df = pd.DataFrame(missing_cnt,
                                       columns=['column_name',
-                                               'missing_count'])
+                                               'value',
+                                               'variable'])
         return missing_cnt_df
 
 
     def get_missing_percentage(self):
-        '''
-        get proportion of missing values in each column of dataframe
-        '''
-        row_count = float(self.shape[0])
-        missing_percent = [[x, self.count[i] / row_count] for i, x in enumerate(self.columns)]
+        '''get proportion of missing values in each column of dataframe'''
+        missing_percent = [[x,
+                           (self.count[i] / self.row_count)*100,
+                           'missing_%'] for i, x in enumerate(self.columns)]
         missing_percent_df = pd.DataFrame(missing_percent,
                                           columns=['column_name',
-                                                   'missing_percent'])
+                                                   'value',
+                                                   'variable'])
         return missing_percent_df
 
 
-
-
+    def get_summary(self):
+        '''collect all column summaries and return as dataframe'''
+        col_types_df = self.get_column_types()
+        missing_cnt_df = self.get_missing_count()
+        missing_percent_df = self.get_missing_percentage()
+        df_summary = pd.concat([col_types_df,
+                                missing_cnt_df,
+                                missing_percent_df])
+        df_summary = df_summary.pivot(index='variable',
+                                      columns='column_name',
+                                      values='value')
+        df_summary.index.name = None
+        return df_summary
