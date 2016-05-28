@@ -84,7 +84,12 @@ class DataFrameSummary(object):
         return missing_percent_df
 
 
-    def get_summary(self):
+    def get_summary(self,
+                    plot=True,
+                    style='fivethirtyeight',
+                    top=15,
+                    save=False,
+                    filename='pandas_summary.png'):
         '''collect all column summaries and return as dataframe'''
         col_types_df = self.get_column_types()
         unique_cnt_df = self.get_unique_count()
@@ -98,20 +103,42 @@ class DataFrameSummary(object):
                                       columns='column_name',
                                       values='value')
         df_summary.index.name = None
+        if plot is True:
+            self.get_summary_plot(df_summary,
+                             style,
+                             top,
+                             save,
+                             filename)
         return df_summary
 
 
-    def get_distributions(self):
-        '''generate distribution plots and summary statistics'''
+
+    def get_summary_plot(self, df_summary,
+                         style,
+                         top,
+                         save,
+                         filename):
+        '''generate plot for pandas summary'''
         import matplotlib.pyplot as plt
-        plt.style.use('fivethirtyeight')
-        if in_ipynb:
-
-        else:
-
-        numeric_df = self.df._get_numeric_data()
-        f = open('/home/jack/report.html','w')
-        f.write(html_string)
-        f.close()
+        plt.style.use(style)
+        # Set color transparency (0: transparent; 1: solid)
+        a = 0.7
+        # Create a colormap
+        customcmap = [(x/24.0,  x/48.0, 0.05) for x in range(len(df_summary))]
+        # Create a figure of given size
+        fig = plt.figure(figsize=(16,8))
+        # Add a subplot
+        ax = fig.add_subplot(111)
+        ax.set_ylabel('')
+        ax.set_xlabel('% of mising values in dataframe columns')
+        df_summary.T.sort_values('missing_%')['missing_%'].plot(kind='barh',
+                                                            ax=ax,
+                                                            alpha=a,
+                                                            legend=False,
+                                                            color=customcmap,
+                                                            edgecolor='w', xlim=(0, 100))
+        if save is True:
+            plt.savefig(filename)
+        plt.show()
 
 
