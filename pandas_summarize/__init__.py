@@ -23,7 +23,7 @@ class DataFrameSummary(object):
         self.count = df.count()
 
 
-    def in_ipynb():
+    def in_ipynb(self):
         '''
         check if code is running in ipython notebook or jupyter
         taken from SO thread:
@@ -110,7 +110,6 @@ class DataFrameSummary(object):
                              save,
                              filename)
         return df_summary
-
 
 
     def get_summary_plot(self, df_summary,
